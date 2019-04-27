@@ -1,13 +1,13 @@
 ## Introduction
 
-[\#icebucketchallenge](https://en.wikipedia.org/wiki/Ice_Bucket_Challenge) was the hashtag to promote awareness of the disease ALS. Eventough, [the origin of the movement](https://en.wikipedia.org/wiki/Ice_Bucket_Challenge#Origins) is not clear, it went viral; meaning that so many users in twitter network start using it. There were so many other movemenets/idea/behaviours like [\#metoo](https://en.wikipedia.org/wiki/Me_Too_movement), [\#ferguson](https://en.wikipedia.org/wiki/Ferguson_unrest), ... that went viral too, and so many of them were not ([\#GazaUnderAttack](https://en.wikipedia.org/wiki/Media_coverage_of_the_2014_Israel%E2%80%93Gaza_conflict),  ). Modeling and studing **Information Cascade** in social network is a hard problem, which most of traditional models like *Threshold Cascade Model* or *Independet Cascade Model* are not successful on modeling them. If we could capture in what situtations users of the network start spreading some information, it would have so many usecases. Specifically in marketing, for influence maximization problem. In this project, I want to use Deep Learning to see the amount of predicibility of users' actions in a given network. As a future work, I want to study parameters of the trained model to see what makes some information spread viral in the network, while others dies out after short time. 
+[\#icebucketchallenge](https://en.wikipedia.org/wiki/Ice_Bucket_Challenge) was the hashtag to promote awareness of the disease ALS. Eventough, [the origin of the movement](https://en.wikipedia.org/wiki/Ice_Bucket_Challenge#Origins) is not clear, it went viral; meaning that so many users in twitter network start using it. There were so many other movemenets/idea/behaviours like [\#metoo](https://en.wikipedia.org/wiki/Me_Too_movement), [\#ferguson](https://en.wikipedia.org/wiki/Ferguson_unrest), ... that went viral too, and so many of them were not ([\#GazaUnderAttack](https://en.wikipedia.org/wiki/Media_coverage_of_the_2014_Israel%E2%80%93Gaza_conflict),  ). Modeling and studing **Information Cascade** in social network is a hard problem, which most of traditional models like *Threshold Cascade Model* or *Independet Cascade Model* are not successful on modeling them. If we could capture in what situtations users of the network start spreading some information, it would have so many usecases. Specifically in marketing, for influence maximization problem. In this project, I want to use Deep Learning to see the amount of predicibility of users' actions in a given network. If the actions are predictable enought, it is a sign that we can propose a good model of human behaviour. For proposing the behavioural model, I want to study parameters of the trained model to see what makes some information spread viral in the network, while others dies out after short time. 
 
 <p align="center">
     <img src="figs/icebucketchallenge.jpg" width="300"/><img src="figs/gaza.jpg" width="300"/> <br/>
     <img src="figs/ferguson.jpeg" width="300"/><img src="figs/metoo.jpeg" width="300"/>
 </p>
 
-This project is [Tensorflow](https://www.tensorflow.org/) implementation of **CascacdeRNN** model. The **CascadeRNN** model is the model inspired by my latest paper ("Friendship Paradox Screws Perception of Popularity", under review). I chose to do the implementation of this model as my Deep Learning course's final project.
+This project is [Tensorflow](https://www.tensorflow.org/) implementation of **CascacdeRNN** model. The **CascadeRNN** model is the model inspired by my latest paper ("Friendship Paradox Screws Perception of Popularity", under review). I took *Deep Learning course* to learn basic concepts of Neural Network and becoming familiar with TensorFlow to be able to implement my idea of using Deep Learning for understading and modeling human behaviour in social networks. So far I've fully implemented the model and got accetable results on a benchmark dataset. As a future work, I want to analyse what is going on inside the learned network and study more complicated datasets. 
 
 ## Problem Formulation 
 
@@ -63,9 +63,42 @@ In the letrature ([TopoLSTM](https://arxiv.org/pdf/1711.10162.pdf)), they have u
 </p>
 
 
-## Resuls 
+## Results 
+I've used twitter benchmark dataset for evaluation of the model. The information about dataset is as follow:
+
+
+\# of nodes | \# of edges | \# of cascades | Avg. cascade size
+------------|-------------|----------------|------------------
+6126 | 8528 | 569 | 14.12
+
+The last row of the following table is results of my model. The rest of the results are grabed from [TopoLSTM](https://arxiv.org/pdf/1711.10162.pdf) paper. In compare with other methods, the results of **CascadeRNN** is close to TopoLSTM and Embedded-IC. 
+
+
+Model | Hit@10 | Hit@50 | Hit@100
+---------|--------|-------|-------
+IC-SB | 22.151 | 31.242 | 32.266 
+DeepWalk | 24.721 | 30.730 | 22.266
+Embedded-IC | 25.134 | 33.493 | 36.597 
+DeepCas | 25.661 | 31.190 | 33.173 
+Topo-LSTM | 28.279 | 33.152 | 34.897
+**CascadeRNN** | 27.76 | 32.95 | 35.28
+
+
+The idea of TopoLSTM is similar to mine, but there are two major difference. 
+1. The usage of gates in TopoLSTM paper makes the model much more complex that interpreting the results of the model is not trivial. While in CascadeRNN, much of the effort for analysis part would be on three weight matrix `W_hh, W_xh, W_hy` and bias term `B_y`, which has a simple intuition. 
+2. The input to TopoLSTM model is a DAG(Directed Acyclic Graph) instead of set of active users in my model. Their goal is to capture structure of the cascade as well as time of becoming active for each user. So, the input size and time complexity of making input is higher in TopoLSTM in compare with CascadeRNN. CascadeRNN captures the structure of the network by multiplying adjacency matrix `A` to set of active users. However, CascadeRNN does not consider time of becoming active for each individual user. I can fix this by using attension-based techniques. 
+
+I was not hopefull on getting comparable results with TopoLSTM when I found the TopoLSTM paper two days before mid-report deadline. But it was really surprising for me that eventhough I'm loosing less information from data in compare with TopoLSTM, I'm not loosing that much HIT. So it means that probably for each individual, the **sequence** of active friends does not play important rule in their decision on becoming active or not, however, the **set** of active friends play the sufficient amount of rule on their decision. 
 
 ## Related Papers
+* [IC-SB](http://staff.icar.cnr.it/manco/Teaching/sn/seminari/GBL10.pdf)
+* [DeepWalk](https://arxiv.org/abs/1403.6652)
+* [Embedded-IC](https://dl.acm.org/citation.cfm?id=2835817)
+* [DeepCas](https://arxiv.org/abs/1611.05373)
+* [TopoLSTM](https://arxiv.org/pdf/1711.10162.pdf)
+
+Twitter data is from [The Simple Rules of Social Contagion](https://arxiv.org/abs/1308.5015), and the cleaned data could be downloaded from [TopoLSTM repository](https://github.com/vwz/topolstm). 
+
 
 ## Author 
 
