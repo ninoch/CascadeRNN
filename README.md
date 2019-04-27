@@ -22,9 +22,18 @@ I want to consider some properties to propose a *comprehensive* model, which can
 
 Considering all of these factors arises difficulty in modeling cascades. 
 
+`x_t` is a binary vector with size *N*, where i-th index shows whether user `i` is active at iteration `t` or not. Last hidden state, `h_t`, is a vector with size *H*. We can get next hidden state and predicted output as follow:
+
 <p align="center">
     <img src="figs/update.png" width="300"/>
 </p>
+
+Here is some intuition behind the update process: 
+* Adjacecny matrix A times x, would be a vector with size *N* which counts the number of active **friends** for each individidual. 
+* Multiplying `Ax` to `W_xh` would capture the effect of what each individual **see** in their neighbourhood to hidden state. 
+* `W_hh` will capture the effect of last hidden state (state of the network so far) on next hidden state. 
+* Bias term `B_y` would capture the level of **activeness** of each individual. 
+* `W_hy` would capture the effect of state of the network on each individual sepratly. 
 
 
 <p align="center">
