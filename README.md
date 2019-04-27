@@ -22,6 +22,34 @@ I want to consider some properties to propose a *comprehensive* model, which can
 
 Considering all of these factors arises difficulty in modeling cascades. 
 
+<p align="center">
+    <img src="figs/update.png" width="300"/>
+</p>
+
+
+<p align="center">
+    <img src="figs/softmax.png" width="300"/>
+</p>
+
+
+
+<p align="center">
+    <img src="figs/cascade_loss.png" width="400"/>
+</p>
+
+
+
+<p align="center">
+    <img src="figs/loss.png" width="500"/>
+</p>
+
+
+
+<p align="center">
+    <img src="figs/metric.png" width="200"/>
+</p>
+
+
 ## Resuls 
 
 ## Related Papers
