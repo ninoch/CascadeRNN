@@ -34,26 +34,25 @@ Here is some intuition behind the update process:
 * `W_hh` will capture the effect of last hidden state (state of the network so far) on next hidden state. 
 * Bias term `B_y` would capture the level of **activeness** of each individual. 
 * `W_hy` would capture the effect of state of the network on each individual sepratly. 
+* Elementwise multiplication of `~ x_t` to output vector, will zero-out output for individuals who are already active, and only keeps the non-active individuals who could become active. 
 
-
+Then, the probability of becoming active for node `v`, given cascade sequence would be the following: 
 <p align="center">
     <img src="figs/softmax.png" width="300"/>
 </p>
 
 
-
+The the loss for each cascade sequence sepratly would be log-likelihood function over time: 
 <p align="center">
     <img src="figs/cascade_loss.png" width="400"/>
 </p>
 
-
-
+The final loss of the model would be loss over all the cascades: 
 <p align="center">
     <img src="figs/loss.png" width="500"/>
 </p>
 
-
-
+In the letrature ([TopoLSTM](https://arxiv.org/pdf/1711.10162.pdf)), they have used HIT and MAP as their evaluation metric. I have used HIT because I found it more intuitive. Hit@10 is the number of succesffully having target node in top-10 nodes with highest probability: 
 <p align="center">
     <img src="figs/metric.png" width="200"/>
 </p>
