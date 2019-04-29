@@ -1,6 +1,6 @@
 ## Introduction
 
-[\#icebucketchallenge](https://en.wikipedia.org/wiki/Ice_Bucket_Challenge) was the hashtag to promote awareness of the disease ALS. Eventough, [the origin of the movement](https://en.wikipedia.org/wiki/Ice_Bucket_Challenge#Origins) is not clear, it went viral; meaning that so many users in twitter network start using it. There were so many other movemenets/idea/behaviours like [\#metoo](https://en.wikipedia.org/wiki/Me_Too_movement), [\#ferguson](https://en.wikipedia.org/wiki/Ferguson_unrest), ... that went viral too, and so many of them were not ([\#GazaUnderAttack](https://en.wikipedia.org/wiki/Media_coverage_of_the_2014_Israel%E2%80%93Gaza_conflict),  ). Modeling and studing **Information Cascade** in social network is a hard problem, which most of traditional models like *Threshold Cascade Model* or *Independet Cascade Model* are not successful on modeling them. If we could capture in what situtations users of the network start spreading some information, it would have so many usecases. Specifically in marketing, for influence maximization problem. In this project, I want to use Deep Learning to see the amount of predicibility of users' actions in a given network. If the actions are predictable enought, it is a sign that we can propose a good model of human behaviour. For proposing the behavioural model, I want to study parameters of the trained model to see what makes some information spread viral in the network, while others dies out after short time. 
+[\#icebucketchallenge](https://en.wikipedia.org/wiki/Ice_Bucket_Challenge) was the hashtag to promote awareness of the ALS disease. Eventough [the origin of the movement](https://en.wikipedia.org/wiki/Ice_Bucket_Challenge#Origins) is not clear, it went viral; meaning that so many users in twitter network start using it. There were so many other movemenets/idea/behaviours like [\#metoo](https://en.wikipedia.org/wiki/Me_Too_movement), [\#ferguson](https://en.wikipedia.org/wiki/Ferguson_unrest), ... that went viral too, and so many of them were not ([\#GazaUnderAttack](https://en.wikipedia.org/wiki/Media_coverage_of_the_2014_Israel%E2%80%93Gaza_conflict)). Modeling and studing **Information Cascade** in social network is a hard problem, which most of traditional models like *Threshold Cascade Model* or *Independet Cascade Model* [are not successful](http://www.theoryofcomputing.org/articles/v011a004/v011a004.pdf) on modeling them. If we could capture in what situtations users of the network start spreading some information, it would have so many usecases. Specifically in marketing, for influence maximization problem. In this project, I want to use Deep Learning to see the amount of predicibility of users' actions in a given network. If the actions are predictable enought, it is a sign that we can propose a good model of human behaviour. For proposing the behavioural model, I want to study parameters of the trained model to see what makes some information spread viral in the network, while others die out after short time. 
 
 <p align="center">
     <img src="figs/icebucketchallenge.jpg" width="300"/><img src="figs/gaza.jpg" width="300"/> <br/>
@@ -25,15 +25,20 @@ I want to consider some properties to propose a *comprehensive* model, which can
 2. **Friendship**: Not all friends have same amount of influence on a user. For example, it is more likely to use a hashtag used by user who I have more mutual friends with rather than a random friend. 
 3. **Interest**: Some users are more interested in particular topics. For example, a user is more likely to retweet a political tweet than a meme. 
 
-Considering all of these factors arises difficulty in modeling cascades. 
+Considering all of these factors arises difficulty in modeling cascades. Since the final goal of my research is to propose a model for human behaviour, I find RNN appropriate for this purpose. The **CascadeRNN** model is the following: 
 
-`x_t` is a binary vector with size *N*, where i-th index shows whether user `i` is active at iteration `t` or not. Last hidden state, `h_t`, is a vector with size *H*. We can get next hidden state and predicted output as follow:
+<p align="center">
+    <img src="figs/model.png" width="300"/>
+</p>
+
+
+The input `x_t` is a binary vector with size *N*, where i-th index shows whether user `i` is active at iteration `t` or not. Last hidden state, `h_t`, is a vector with size *H*. Next hidden state and logits formula is as follow:
 
 <p align="center">
     <img src="figs/update.png" width="300"/>
 </p>
 
-Here is some intuition behind the update process: 
+Some intuition behind the update process: 
 * Adjacecny matrix A times x, would be a vector with size *N* which counts the number of active **friends** for each individidual. 
 * Multiplying `Ax` to `W_xh` would capture the effect of what each individual **see** in their neighbourhood to hidden state. 
 * `W_hh` will capture the effect of last hidden state (state of the network so far) on next hidden state. 
@@ -41,13 +46,13 @@ Here is some intuition behind the update process:
 * `W_hy` would capture the effect of state of the network on each individual sepratly. 
 * Elementwise multiplication of `~ x_t` to output vector, will zero-out output for individuals who are already active, and only keeps the non-active individuals who could become active. 
 
-Then, the probability of becoming active for node `v`, given cascade sequence would be the following: 
+The final output of the model is vector with size *N*, where i-th index is probability of becoming active for node `i`. So, the probability of becoming active for node `v`, given cascade sequence would be the following: 
 <p align="center">
     <img src="figs/softmax.png" width="300"/>
 </p>
 
 
-The the loss for each cascade sequence sepratly would be log-likelihood function over time: 
+The the loss for each individual cascade sequence would be log-likelihood function over time: 
 <p align="center">
     <img src="figs/cascade_loss.png" width="400"/>
 </p>
@@ -62,6 +67,18 @@ In the letrature ([TopoLSTM](https://arxiv.org/pdf/1711.10162.pdf)), they have u
     <img src="figs/metric.png" width="200"/>
 </p>
 
+## Implementation
+You can run the code by running `python src/train.py`. You can use flags to work with Hyperparameters and run the code on different datasets. The flags are as follow (the default value is in paranthesis. 
+`
+--dataname (twitter)
+--learning_rate (0.01)
+--regularization_scale (0.001)
+--epochs (50)
+--batch_size (64) 
+--hidden_dim (100)
+--max_steps (30)
+--early_stopping (10)
+`
 
 ## Results 
 I've used twitter benchmark dataset for evaluation of the model. The information about dataset is as follow:
@@ -89,6 +106,12 @@ The idea of TopoLSTM is similar to mine, but there are two major difference.
 2. The input to TopoLSTM model is a DAG(Directed Acyclic Graph) instead of set of active users in my model. Their goal is to capture structure of the cascade as well as time of becoming active for each user. So, the input size and time complexity of making input is higher in TopoLSTM in compare with CascadeRNN. CascadeRNN captures the structure of the network by multiplying adjacency matrix `A` to set of active users. However, CascadeRNN does not consider time of becoming active for each individual user. I can fix this by using attension-based techniques. 
 
 I was not hopefull on getting comparable results with TopoLSTM when I found the TopoLSTM paper two days before mid-report deadline. But it was really surprising for me that eventhough I'm loosing less information from data in compare with TopoLSTM, I'm not loosing that much HIT. So it means that probably for each individual, the **sequence** of active friends does not play important rule in their decision on becoming active or not, however, the **set** of active friends play the sufficient amount of rule on their decision. 
+
+## Future Work
+I want to do the following for future work:
+1. As I mentioned in Intoroduction, my main goal of doing this kind of research was *not* cascade forcasting. What I really want to do is to understand human behaviour and propose behavioural model. So, my next step would be analyzing weights of my model, using matrix factorization.
+2. Currently h0 is always zero for all inputs. I want to make it as output of sentence2vec to capture the content of the tweet. The goal of doing this is to consider **Interest** of users, as I mentioned in model section. The other two features (**Activeness** and **Frienedship**) are already satisfy by my model. 
+3. I want to take a new step on forecasting, and instead of considering diffusion of *one* tweet, I want to consider hashtags, which has same content but different representation. 
 
 ## Related Papers
 * [IC-SB](http://staff.icar.cnr.it/manco/Teaching/sn/seminari/GBL10.pdf)
