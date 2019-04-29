@@ -69,16 +69,16 @@ In the letrature ([TopoLSTM](https://arxiv.org/pdf/1711.10162.pdf)), they have u
 
 ## Implementation
 You can run the code by running `python src/train.py`. You can use flags to work with Hyperparameters and run the code on different datasets. The flags are as follow (the default value is in parentheses). 
-`
---dataname (twitter)
---learning_rate (0.01)
---regularization_scale (0.001)
---epochs (50)
---batch_size (64) 
---hidden_dim (100)
---max_steps (30)
---early_stopping (10)
-`
+
+* `--dataname (twitter)`
+* `--learning_rate (0.01)`
+* `--regularization_scale (0.001)`
+* `--epochs (50)`
+* `--batch_size (64)`
+* `--hidden_dim (100)`
+* `--max_steps (30)`
+* `--early_stopping (10)`
+
 The input must be sub-folder inside `datasets/` folder, and it must contain three `.txt` files: 
 * `graph.txt`: each line represents an edge in this file. 
 * `train.txt`: each line represents a cascade, which is sequence of user ID and seconds passed to retweet by this user after first tweets.
