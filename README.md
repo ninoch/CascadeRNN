@@ -28,7 +28,7 @@ I want to consider some properties to propose a *comprehensive* model, which can
 Considering all of these factors arises difficulty in modeling cascades. Since the final goal of my research is to propose a model for human behaviour, I find RNN appropriate for this purpose. The **CascadeRNN** model is the following: 
 
 <p align="center">
-    <img src="figs/model.png" width="300"/>
+    <img src="figs/model.png" width="700"/>
 </p>
 
 
@@ -68,7 +68,7 @@ In the letrature ([TopoLSTM](https://arxiv.org/pdf/1711.10162.pdf)), they have u
 </p>
 
 ## Implementation
-You can run the code by running `python src/train.py`. You can use flags to work with Hyperparameters and run the code on different datasets. The flags are as follow (the default value is in paranthesis. 
+You can run the code by running `python src/train.py`. You can use flags to work with Hyperparameters and run the code on different datasets. The flags are as follow (the default value is in parentheses). 
 `
 --dataname (twitter)
 --learning_rate (0.01)
@@ -79,6 +79,12 @@ You can run the code by running `python src/train.py`. You can use flags to work
 --max_steps (30)
 --early_stopping (10)
 `
+The input must be sub-folder inside `datasets/` folder, and it must contain three `.txt` files: 
+* `graph.txt`: each line represents an edge in this file. 
+* `train.txt`: each line represents a cascade, which is sequence of user ID and seconds passed to retweet by this user after first tweets.
+*  `test.txt`: same as train, but cascades for test.
+
+I've put `twitter` dataset inside the dataset folder for your test. I've download dataset from [TopoLSTM repository](https://github.com/vwz/topolstm).
 
 ## Results 
 I've used twitter benchmark dataset for evaluation of the model. The information about dataset is as follow:
@@ -108,10 +114,9 @@ The idea of TopoLSTM is similar to mine, but there are two major difference.
 I was not hopefull on getting comparable results with TopoLSTM when I found the TopoLSTM paper two days before mid-report deadline. But it was really surprising for me that eventhough I'm loosing less information from data in compare with TopoLSTM, I'm not loosing that much HIT. So it means that probably for each individual, the **sequence** of active friends does not play important rule in their decision on becoming active or not, however, the **set** of active friends play the sufficient amount of rule on their decision. 
 
 ## Future Work
-I want to do the following for future work:
-1. As I mentioned in Intoroduction, my main goal of doing this kind of research was *not* cascade forcasting. What I really want to do is to understand human behaviour and propose behavioural model. So, my next step would be analyzing weights of my model, using matrix factorization.
-2. Currently h0 is always zero for all inputs. I want to make it as output of sentence2vec to capture the content of the tweet. The goal of doing this is to consider **Interest** of users, as I mentioned in model section. The other two features (**Activeness** and **Frienedship**) are already satisfy by my model. 
-3. I want to take a new step on forecasting, and instead of considering diffusion of *one* tweet, I want to consider hashtags, which has same content but different representation. 
+1. As I mentioned in [Intoroduction](https://github.com/ninoch/CascadeRNN/blob/master/README.md#introduction), my main goal of doing this kind of research was *not* cascade forcasting. What I really want to do is to understand human behaviour and propose behavioural model. So, my main next step would be analyzing weights of my model, using matrix factorization.
+2. Currently h0 is always zero for all inputs. I want to make it as output of sentence2vec to capture the content of the tweet. The goal of doing this is to consider **Interest** of users, as I mentioned in [model](https://github.com/ninoch/CascadeRNN/blob/master/README.md#model) section. The other two features (**Activeness** and **Frienedship**) are already satisfy by my model. 
+3. I want to take a new step on forecasting, and instead of considering diffusion of *one* tweet, I want to consider diffusion of all tweets with same hashtag. These tweets are talking about same thing, but with different representations. Specifically, I am much more interested in movement and events hashtags like \#ferguson, \#icebucketchallenge, \#tcot, \#sxsw, and not regular hashtags. 
 
 ## Related Papers
 * [IC-SB](http://staff.icar.cnr.it/manco/Teaching/sn/seminari/GBL10.pdf)
