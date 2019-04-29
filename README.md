@@ -12,7 +12,7 @@ This project is [Tensorflow](https://www.tensorflow.org/) implementation of **Ca
 ## Problem Formulation 
 
 I aim to study the task of information cascade forecasting, which tries to estimate which node is going to be activated next based on history of cascade and network structure. We need two terminologies for defining the problem: 
-* **Adjacency Matrix**: Consider a undirected network G = (V, E), with {V} nodes and {E} links. A link (u, v) indicates that *u* and *v* are friends. Let's define the number of nodes of graph G as n = |V|. We can define *n* by *n* binary matrix A, as adjacency matrix of G, where A(i, j) shows whether *i* and *j* are friends or not. 
+* **Adjacency Matrix**: Consider a undirected network G = (V, E), with {V} nodes and {E} links. A link (u, v) indicates that *u* and *v* are friends. Let's define *N* as number of nodes in G. We can define *N* by *N* binary matrix A, as adjacency matrix of G, where A(i, j) shows whether *i* and *j* are friends or not. 
 
 * **Cascade Sequence**: A cascade sequence is an ordered sequence of nodes s = {v1, v2, ..., vT}, where each v is a distinct node in V. 
 
